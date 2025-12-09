@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>local@localhost</email>
+		<name>Local Maintainer</name>
+	</maintainer>
+	<longdescription>
+		An unofficial launcher for the Android version of Minecraft Bedrock Edition on Linux.
+		Allows you to run Minecraft Bedrock Edition natively on Linux systems by using the
+		Android APK with compatibility layers.
+	</longdescription>
+	<use>
+		<flag name="webview">Enable webview support for Xbox Live login using Qt WebEngine</flag>
+	</use>
+	<upstream>
+		<remote-id type="github">minecraft-linux/mcpelauncher-manifest</remote-id>
+	</upstream>
+</pkgmetadata>

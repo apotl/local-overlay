@@ -1,0 +1,1 @@
+My personal local overlay for Gentoo Linux. I don't really endorse using these; I've used AI extensively in developing these, [permanently barring these scripts from finding their way into the Gentoo project](https://wiki.gentoo.org/wiki/Project:Council/AI_policy), and these see no testing outside of my own machine.
