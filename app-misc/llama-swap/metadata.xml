@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>local@localhost</email>
+		<name>Local Maintainer</name>
+	</maintainer>
+	<longdescription>
+		llama-swap is an OpenAI-compatible API proxy that hot-swaps between
+		local LLM inference backends based on the requested model. It supports
+		llama.cpp, vllm, tabbyAPI, and other compatible servers, allowing
+		multiple models to be managed from a single endpoint without keeping
+		all of them loaded in memory simultaneously.
+	</longdescription>
+	<use>
+		<flag name="gui">Build and embed the Svelte web UI into the binary</flag>
+	</use>
+	<upstream>
+		<remote-id type="github">mostlygeek/llama-swap</remote-id>
+	</upstream>
+</pkgmetadata>
