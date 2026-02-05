@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>local@localhost</email>
+		<name>Local Overlay Maintainer</name>
+	</maintainer>
+	<longdescription>
+		vLLM is a fast and easy-to-use library for LLM inference and serving.
+
+		vLLM is fast with:
+		- State-of-the-art serving throughput
+		- Efficient management of attention key and value memory with PagedAttention
+		- Continuous batching of incoming requests
+		- Fast model execution with CUDA/HIP graph
+		- Quantization: GPTQ, AWQ, SqueezeLLM, FP8 KV Cache
+		- Optimized CUDA kernels
+
+		vLLM is flexible and easy to use with:
+		- Seamless integration with popular HuggingFace models
+		- High-throughput serving with various decoding algorithms
+		- Tensor parallelism support for distributed inference
+		- Streaming outputs
+		- OpenAI-compatible API server
+		- Support NVIDIA GPUs, AMD GPUs, and CPU
+	</longdescription>
+	<use>
+		<flag name="cuda">Enable NVIDIA CUDA GPU support</flag>
+		<flag name="rocm">Enable AMD ROCm GPU support</flag>
+		<flag name="cpu">Enable CPU-only mode</flag>
+		<flag name="flashinfer">Enable FlashInfer integration for faster attention</flag>
+		<flag name="audio">Enable audio processing support</flag>
+	</use>
+	<upstream>
+		<remote-id type="github">vllm-project/vllm</remote-id>
+		<doc>https://docs.vllm.ai/</doc>
+		<bugs-to>https://github.com/vllm-project/vllm/issues</bugs-to>
+	</upstream>
+</pkgmetadata>
