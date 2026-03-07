@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>alec@localhost</email>
+		<name>Alec</name>
+	</maintainer>
+	<longdescription lang="en">
+		Thermal watchdog daemon for AMD Ryzen CPUs using the k10temp driver.
+		Monitors CPU temperature and performs an emergency reboot at 92C
+		to prevent hardware damage when no kernel thermal zone is available.
+	</longdescription>
+</pkgmetadata>

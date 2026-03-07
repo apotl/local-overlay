@@ -1,0 +1,13 @@
+[Unit]
+Description=Thermal watchdog (reboot at 92C)
+DefaultDependencies=no
+After=sysinit.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/thermal-watchdog
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
