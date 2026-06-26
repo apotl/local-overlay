@@ -1,0 +1,50 @@
+gfx1100/ROCm: offload MoE-router GGML_OP_SUM_ROWS to the CPU backend
+
+The standalone reduce_rows_f32 kernel launch used for the MoE router top-k
+weight normalization (the RESHAPE->SUM_ROWS->CLAMP->DIV->RESHAPE path taken
+whenever the router is not handled by the fused topk-moe kernel, e.g. with the
+production `-ot ffn_gate_inp=CPU`) fails AQL dispatch on gfx1100 (RX 7900 XT)
+with hipErrorIllegalState:
+
+    ShaderName : void reduce_rows_f32<false>(float const*, float*, int)
+    rocvirtual.cpp:3650: Pcie atomics not enabled, hostcall not supported
+    rocvirtual.cpp:3990: AQL dispatch failed!
+    hipLaunchKernel: Returned hipErrorIllegalState
+    ggml-cuda.cu: ROCm error: the operation cannot be performed in the present state
+      in function ggml_cuda_kernel_launch at common.cuh <- ggml_cuda_op_sum_rows
+
+This is NOT a launch-dimension overflow: the failing launch is grid {168,1,1},
+block {32,1,1}. The reduce_rows_f32 code object requires hostcall services that
+are unavailable because PCIe atomics are not enabled on this root complex, so
+the runtime rejects the dispatch. Reporting GGML_OP_SUM_ROWS as unsupported on
+the HIP backend makes the ggml scheduler run that one tiny reduction on the CPU
+backend while every other op stays on the GPU -- which `-ot` cannot express (it
+moves tensors, not ops). See README.md in this directory for full diagnosis.
+
+Diagnosed 2026-06-26 on llama.cpp HEAD 3fc4e105 (sci-misc/llama-cpp-9999, guru
+overlay), ROCm 7.2, gfx1100, under dev-debug/gdb[rocm]+AMD_LOG_LEVEL=3. Remove
+once fixed upstream or once PCIe atomics / hostcall work on this hardware.
+
+diff --git a/ggml/src/ggml-cuda/ggml-cuda.cu b/ggml/src/ggml-cuda/ggml-cuda.cu
+--- a/ggml/src/ggml-cuda/ggml-cuda.cu
++++ b/ggml/src/ggml-cuda/ggml-cuda.cu
+@@ -5432,6 +5432,19 @@
+             return true;
+ #endif
+         case GGML_OP_SUM_ROWS:
++#if defined(GGML_USE_HIP)
++            // gfx1100/ROCm workaround: the standalone reduce_rows_f32 launch used for
++            // the MoE router top-k weight normalization fails AQL dispatch with
++            // hipErrorIllegalState ("operation cannot be performed in the present
++            // state"). That kernel's code object requires hostcall services which are
++            // unavailable on this PCIe topology ("Pcie atomics not enabled, hostcall
++            // not supported"), so the dispatch is rejected. Force GGML_OP_SUM_ROWS onto
++            // the CPU backend (the reduction is tiny); everything else stays on GPU.
++            // Local llama-cpp overlay patch -- drop once fixed upstream/by hardware.
++            return false;
++#else
++            return ggml_is_contiguous(op->src[0]);
++#endif
+         case GGML_OP_MEAN:
+         case GGML_OP_GROUP_NORM:
+             return ggml_is_contiguous(op->src[0]);

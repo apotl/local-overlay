@@ -1,0 +1,26 @@
+Phase 3 validation — sci-misc/llama-cpp-9999 with NDEBUG (this directory's fix)
+==============================================================================
+Date:    2026-06-26
+Host:    alight, AMD RX 7900 XT / Navi 31 / gfx1100, ROCm 7.2
+Source:  llama.cpp HEAD 3fc4e105 (pinned for the A/B via EGIT_OVERRIDE_COMMIT)
+Model:   Qwen3.6-35B-A3B-UD-IQ4_XS.gguf
+Config:  -ot ffn_gate_inp=CPU --flash-attn on -np 1 -c 131072 q8_0 KV  (production baseline)
+Payload: /home/alec/qwen36-crash-repro.json (~20k-token prefill + 27 tools)
+
+BEFORE (stock guru build, asserts on):   5/5 CRASH at ggml_cuda_op_sum_rows
+                                          (reduce_rows_f32 -> hostcall -> AQL dispatch
+                                           failed -> hipErrorIllegalState)
+
+ATTEMPT 1 (supports_op=false patch):      load-time abort — the CPU-resident SUM_ROWS
+                                          node trips the debug assert at
+                                          ggml-cuda.cu:4406 in HIP graph capture.
+                                          REJECTED (see *.patch.superseded).
+
+FIX (NDEBUG / real release build):        n=5 fresh-server trials, all OK:
+    trial1 OK prefill_tok_s=1164.19
+    trial2 OK prefill_tok_s=1157.44
+    trial3 OK prefill_tok_s=1148.72
+    trial4 OK prefill_tok_s=1144.45
+    trial5 OK prefill_tok_s=1146.72
+    => OK=5/5  CRASH=0  at full GPU speed (~1150 tok/s prefill; the all-experts-on-CPU
+       workaround was tens of tok/s). No ROCm/abort/assert signatures in any trial log.
